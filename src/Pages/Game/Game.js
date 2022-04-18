@@ -3,7 +3,12 @@ import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import md5 from 'crypto-js/md5';
-import { saveScore, saveAssertions, thunkToken } from '../../Redux/actions/index';
+import {
+  saveScore,
+  saveCurrentScore,
+  saveAssertions,
+  thunkToken,
+} from '../../Redux/actions/index';
 import Header from '../../Componentes/Header';
 import './gameStyle.css';
 import { getQuestions, getAnswers } from '../../Helpers/gameFunctions';
@@ -19,8 +24,6 @@ class Game extends React.Component {
       questionAnswered: false,
       timer: 30,
       answers: [],
-      currentScore: 0,
-      currentAssertions: 0,
       questionDifficulties: {
         easy: 1, medium: 2, hard: 3,
       },
@@ -28,7 +31,8 @@ class Game extends React.Component {
   }
 
   async componentDidMount() {
-    const { userEmail, getToken, token, category, difficulty, questionType } = this.props;
+    const { userEmail, getToken, token, category, difficulty,
+      questionType, updateCurrentScore, updateAssertion } = this.props;
     const questions = await getQuestions(token || await getToken(), getToken,
       { category, difficulty, questionType });
     const answers = getAnswers(questions[0]);
@@ -36,6 +40,8 @@ class Game extends React.Component {
     const URL = `https://www.gravatar.com/avatar/${emailToUse}`;
     this.setState({ questions, answers, image: URL });
     this.activateInterval();
+    updateCurrentScore(0);
+    updateAssertion(0);
   }
 
   componentWillUnmount() {
@@ -69,20 +75,16 @@ class Game extends React.Component {
   }
 
   addPoints = () => {
-    const { questions, currentQuestion, timer,
-      questionDifficulties, currentScore, currentAssertions } = this.state;
-    const { updateScore, updateAssertion,
-      score } = this.props;
+    const { questions, currentQuestion, timer, questionDifficulties } = this.state;
+    const { updateScore, updateCurrentScore,
+      updateAssertion, score, currentScore, assertions } = this.props;
     let { difficulty } = questions[currentQuestion];
     difficulty = questionDifficulties[difficulty];
     const ten = 10;
     const points = ten + (timer * difficulty);
-    this.setState({
-      currentScore: currentScore + points,
-      currentAssertions: currentAssertions + 1,
-    });
     updateScore(score + points);
-    updateAssertion(currentAssertions + 1);
+    updateCurrentScore(currentScore + points);
+    updateAssertion(assertions + 1);
   }
 
   generateAnswersButton = () => {
@@ -174,8 +176,8 @@ class Game extends React.Component {
   }
 
   render() {
-    const { image, currentScore } = this.state;
-    const { userName } = this.props;
+    const { image } = this.state;
+    const { userName, currentScore } = this.props;
     return (
       <main className="Game">
         <div className="Content">
@@ -206,8 +208,11 @@ Game.propTypes = {
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   getToken: PropTypes.func.isRequired,
   updateScore: PropTypes.func.isRequired,
+  updateCurrentScore: PropTypes.func.isRequired,
   updateAssertion: PropTypes.func.isRequired,
   score: PropTypes.number.isRequired,
+  currentScore: PropTypes.number.isRequired,
+  assertions: PropTypes.number.isRequired,
   category: PropTypes.string.isRequired,
   difficulty: PropTypes.string.isRequired,
   questionType: PropTypes.string.isRequired,
@@ -218,6 +223,8 @@ const mapStateToProps = (store) => ({
   userEmail: store.player.gravatarEmail,
   token: store.token,
   score: store.player.score,
+  currentScore: store.player.currentScore,
+  assertions: store.player.assertions,
   category: store.settings.category,
   difficulty: store.settings.difficulty,
   questionType: store.settings.questionType,
@@ -226,6 +233,7 @@ const mapStateToProps = (store) => ({
 const mapDispatchToProps = (dispatch) => ({
   getToken: () => dispatch(thunkToken()),
   updateScore: (score) => dispatch(saveScore(score)),
+  updateCurrentScore: (currentScore) => dispatch(saveCurrentScore(currentScore)),
   updateAssertion: (assertion) => dispatch(saveAssertions(assertion)),
 });
 
