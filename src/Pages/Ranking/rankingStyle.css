@@ -1,5 +1,6 @@
-* {
+.Ranking * {
   margin: 0;
+  padding: 0;
 }
 
 .Ranking {
@@ -9,6 +10,36 @@
   flex-direction: column;
   height: 100vh;
   justify-content: center;
+}
+
+.Ranking .emptyRanking {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+.Ranking .rankingTable {
+  border-collapse: collapse;
+  margin: 15px;
+  text-align: center;
+}
+
+.Ranking .rankingTable th {
+  border-bottom: 1px solid black;
+  font-size: 18px;
+  padding: 15px 10px;
+}
+
+.Ranking .rankingTable td {
+  border-bottom: 1px solid black;
+  font-size: 17px;
+  padding: 5px 0;
+}
+
+.Ranking .rankingTable img {
+  border-radius: 50%;
+  max-height: 50px;
+  max-width: 50px;
 }
 
 .buttonInicio {

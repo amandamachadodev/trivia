@@ -8,11 +8,11 @@ class Ranking extends React.Component {
     const ranking = getSortedRanking();
     if (ranking.length === 0) {
       return (
-        <p>Conclua o jogo para aparecer aqui.</p>
+        <p className="emptyRanking">Conclua o jogo para aparecer aqui.</p>
       );
     }
     return (
-      <table>
+      <table className="rankingTable">
         <thead>
           <tr>
             <th>Gravatar</th>
@@ -51,11 +51,11 @@ class Ranking extends React.Component {
 
   render() {
     return (
-      <div className="Ranking">
-        <h2 data-testid="ranking-title">Ranking</h2>
+      <main className="Ranking">
+        <h1 data-testid="ranking-title">Ranking</h1>
         {this.renderRanking()}
         {this.renderHomeButton()}
-      </div>
+      </main>
     );
   }
 }
